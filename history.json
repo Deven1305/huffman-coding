@@ -1,1 +1,106 @@
-[]
+[
+  {
+    "id": 1777611577194,
+    "timestamp": "2026-05-01T04:59:37.194Z",
+    "input": "hello world",
+    "inputPreview": "hello world",
+    "codes": {
+      "h": "000",
+      "e": "001",
+      " ": "010",
+      "w": "011",
+      "l": "10",
+      "o": "110",
+      "r": "1110",
+      "d": "1111"
+    },
+    "encoded": "00000110101100100111101110101111",
+    "tree": {
+      "char": null,
+      "freq": 11,
+      "left": {
+        "char": null,
+        "freq": 4,
+        "left": {
+          "char": null,
+          "freq": 2,
+          "left": {
+            "char": "h",
+            "freq": 1,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "char": "e",
+            "freq": 1,
+            "left": null,
+            "right": null
+          }
+        },
+        "right": {
+          "char": null,
+          "freq": 2,
+          "left": {
+            "char": " ",
+            "freq": 1,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "char": "w",
+            "freq": 1,
+            "left": null,
+            "right": null
+          }
+        }
+      },
+      "right": {
+        "char": null,
+        "freq": 7,
+        "left": {
+          "char": "l",
+          "freq": 3,
+          "left": null,
+          "right": null
+        },
+        "right": {
+          "char": null,
+          "freq": 4,
+          "left": {
+            "char": "o",
+            "freq": 2,
+            "left": null,
+            "right": null
+          },
+          "right": {
+            "char": null,
+            "freq": 2,
+            "left": {
+              "char": "r",
+              "freq": 1,
+              "left": null,
+              "right": null
+            },
+            "right": {
+              "char": "d",
+              "freq": 1,
+              "left": null,
+              "right": null
+            }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "originalBits": 88,
+      "compressedBits": 32,
+      "savedBits": 56,
+      "ratio": 63.64,
+      "avgCodeLen": 2.909,
+      "entropy": 2.8454,
+      "weightedAvg": 2.9091,
+      "totalChars": 11,
+      "uniqueChars": 8
+    }
+  }
+]

@@ -794,7 +794,7 @@ function renderITCSolution(symbols, result) {
         <div class="step-title-text">${s.title}</div>
       </div>
       <div>${s.render()}</div>
-      ${i < stepsData.length - 1 ? '<div class="step-connector">down</div>' : ''}
+      ${i < stepsData.length - 1 ? '<div class="step-connector">↓</div>' : ''}
     `;
     container.appendChild(div);
   });
