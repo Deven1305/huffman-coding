@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Huffman Lab | Lossless Compression Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Navigation bar with scroll-spy highlighting -->
+<nav id="navbar">
+  <div class="nav-logo">Huffman<span>Lab</span></div>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#encoder">Encoder</a></li>
+    <li><a href="#tree">Tree Builder</a></li>
+    <li><a href="#decoder">Decoder</a></li>
+    <li><a href="#info-theory">Info Theory</a></li>
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#history">History</a></li>
+  </ul>
+</nav>
+
+<!-- Hero section: headline, live session stats, CTA -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Compression Tool</div>
+    <h1 class="hero-title">
+      Compress it.<br>
+      <span class="accent">Visualize</span> it.<br>
+      <span class="gold">Decode</span> it.
+    </h1>
+    <p class="hero-sub">An interactive tool for Huffman Encoding. Watch the tree build step by step, decode any bit-stream, and explore compression metrics.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="heroCharsEncoded">0</span>
+        <span class="hero-stat-lbl">Characters encoded</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="heroBitsSaved">0</span>
+        <span class="hero-stat-lbl">Bits saved</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num" id="heroSessions">0</span>
+        <span class="hero-stat-lbl">Sessions run</span>
+      </div>
+    </div>
+    <a href="#encoder" class="btn-primary">Start Encoding</a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Encoder: text input, preset chips, encoded output, metrics, code table -->
+<section id="encoder">
+  <div class="section-tag">01 Encoder</div>
+  <h2 class="section-title">Huffman Encoder</h2>
+  <p class="section-sub">Type any text and instantly see the Huffman codes, bit-stream, and compression statistics compared to ASCII.</p>
+
+  <div class="encoder-layout">
+    <!-- Text input area -->
+    <div class="input-area">
+      <div class="textarea-wrap">
+        <textarea id="inputText" placeholder="Type or paste your text here&#10;&#10;e.g. abracadabra" spellcheck="false"></textarea>
+        <span class="char-count" id="charCount">0 chars</span>
+      </div>
+      <!-- Preset sample strings -->
+      <div class="presets-row" id="presets"></div>
+      <button class="encode-btn" onclick="encode()">Encode with Huffman</button>
+    </div>
+
+    <!-- Output panel: bit stream, comparison row, metrics grid -->
+    <div class="output-panel">
+      <div id="outputPlaceholder" class="output-placeholder card">
+        <div class="icon">🌿</div>
+        <div>Your encoded output will appear here.</div>
+        <div style="font-size:12px;color:var(--muted)">Type text and click Encode</div>
+      </div>
+
+      <!-- Colour-coded bit stream display -->
+      <div id="bitSection" style="display:none">
+        <div class="output-header">
+          <span class="output-label">Encoded Bit-Stream</span>
+          <button class="copy-btn" onclick="copyBits()">Copy bits</button>
+        </div>
+        <div id="bitOutput"></div>
+      </div>
+
+      <!-- ASCII vs Huffman size comparison -->
+      <div class="compare-row" id="compareRow">
+        <div class="compare-card">
+          <div class="cc-label">ASCII Original</div>
+          <div class="cc-bits" id="ccOrigBits">0</div>
+          <div class="cc-sub" id="ccOrigSub">8 bits/char</div>
+        </div>
+        <div class="compare-card">
+          <div class="cc-label">Huffman Encoded</div>
+          <div class="cc-bits" id="ccCompBits">0</div>
+          <div class="cc-sub" id="ccCompSub">avg bits/char</div>
+        </div>
+        <div class="compare-card saved">
+          <div class="cc-label">Bits Saved</div>
+          <div class="cc-bits" id="ccSavedBits" style="color:var(--green)">0</div>
+          <div class="cc-sub" id="ccSavedPct">compression ratio</div>
+        </div>
+      </div>
+
+      <!-- Entropy, average code length, efficiency, unique chars -->
+      <div class="metrics-grid" id="metricsGrid">
+        <div class="metric-card">
+          <span class="metric-val" id="mEntropy" style="color:var(--accent2)">0</span>
+          <span class="metric-lbl">Shannon Entropy (H)</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-val" id="mAvgLen" style="color:var(--gold)">0</span>
+          <span class="metric-lbl">Avg Code Length (L)</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-val" id="mEfficiency" style="color:var(--green)">0</span>
+          <span class="metric-lbl">Efficiency H/L</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-val" id="mUnique" style="color:var(--cyan)">0</span>
+          <span class="metric-lbl">Unique Characters</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-width Huffman code dictionary table -->
+  <div id="codeTable" style="margin-top:24px;">
+    <div class="output-header" style="margin-bottom:12px">
+      <span class="output-label">Huffman Code Dictionary</span>
+      <span style="font-size:12px;color:var(--muted)" id="codeTableMeta"></span>
+    </div>
+    <div class="table-wrap">
+      <table class="code-tbl">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Frequency</th>
+            <th>Probability</th>
+            <th>Huffman Code</th>
+            <th>Code Length</th>
+            <th>ASCII (8 bits)</th>
+            <th>Bits Saved</th>
+          </tr>
+        </thead>
+        <tbody id="codeTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Tree animation: heap visualiser + step-through SVG tree -->
+<section id="tree">
+  <div class="section-tag">02 Tree Builder</div>
+  <h2 class="section-title">Animated Tree Construction</h2>
+  <p class="section-sub">Watch the Min-Heap merge nodes step by step, building the Huffman tree from the ground up.</p>
+
+  <div class="tree-outer">
+    <div class="tree-controls">
+      <button class="ctrl-btn" id="btnPlay" onclick="TreeAnim.play()">Play</button>
+      <button class="ctrl-btn" id="btnStep" onclick="TreeAnim.step()">Step</button>
+      <button class="ctrl-btn" id="btnReset" onclick="TreeAnim.reset()">Reset</button>
+      <span class="step-label" id="stepLabel">Encode text first</span>
+      <label style="font-size:12px;color:var(--muted);margin-left:auto">Speed:</label>
+      <select id="animSpeed" class="speed-sel">
+        <option value="1800">Slow</option>
+        <option value="900" selected>Normal</option>
+        <option value="350">Fast</option>
+      </select>
+    </div>
+    <div class="step-progress" id="stepProgress" style="margin:0;height:3px;">
+      <div class="step-progress-fill" id="stepProgressFill" style="width:0%"></div>
+    </div>
+    <div class="step-desc" id="stepDesc">Encode text above to see the step-by-step tree construction.</div>
+    <!-- Min-heap priority queue visualiser -->
+    <div class="heap-section">
+      <div class="heap-title">Min-Heap Priority Queue</div>
+      <div class="heap-nodes" id="heapNodes">
+        <div style="color:var(--muted);font-size:13px">Nodes will appear here after encoding</div>
+      </div>
+    </div>
+    <!-- SVG canvas for the tree diagram -->
+    <div class="tree-svg-area" id="treeSvgArea">
+      <div class="tree-placeholder-msg">
+        <div style="font-size:36px;margin-bottom:12px">🌳</div>
+        <div>The Huffman tree will grow here step by step.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Decoder: paste a bit-stream, decode using the last encoded tree -->
+<section id="decoder">
+  <div class="section-tag">03 Decoder</div>
+  <h2 class="section-title">Huffman Decoder</h2>
+  <p class="section-sub">Paste a bit-stream to decode it using the tree from your last encoding session. Must encode first.</p>
+
+  <div class="decoder-layout">
+    <div>
+      <div class="output-header" style="margin-bottom:8px">
+        <span class="output-label">Bit-Stream Input</span>
+        <button class="copy-btn" onclick="pasteLastEncoded()">Paste last encoded</button>
+      </div>
+      <textarea id="decodeInput" placeholder="Paste bit-stream here (only 0s and 1s)" style="min-height:120px;font-size:13px"></textarea>
+      <button class="decode-btn" onclick="doDecode()">Decode Bit-Stream</button>
+    </div>
+    <div>
+      <div class="output-label" style="margin-bottom:8px">Decoded Output</div>
+      <div id="decodeResult">Decoded text will appear here.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Calculator: entropy, average length, efficiency -->
+<section id="info-theory">
+  <div class="section-tag">04 Calculator</div>
+  <h2 class="section-title">Compression Calculator</h2>
+  <p class="section-sub">Calculate Shannon Entropy, average codeword length, and efficiency with animated step-by-step solutions.</p>
+
+  <div class="itc-tabs">
+    <button class="itc-tab active" onclick="switchITC('from-text')">From Encoded Text</button>
+    <button class="itc-tab" onclick="switchITC('manual')">Manual Symbols</button>
+  </div>
+
+  <!-- Auto-populated from the last encoding session -->
+  <div class="itc-panel active" id="itcPanelFromText">
+    <div class="from-text-note visible" id="fromTextNote">
+      Encode some text first, then click below to auto-populate probabilities.
+    </div>
+    <button class="calc-itc-btn" onclick="calcITCFromText()">Calculate from encoded text</button>
+  </div>
+
+  <!-- Manual symbol/probability entry -->
+  <div class="itc-panel" id="itcPanelManual">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Enter your symbols and their probabilities (must sum to 1). The system will compute Huffman codes then solve entropy and efficiency.</p>
+    <div class="symbols-grid" id="manualSymbols"></div>
+    <button class="add-sym-btn" onclick="addManualSymbol()">+ Add Symbol</button>
+    <br>
+    <button class="calc-itc-btn" onclick="calcITCManual()">Solve Step by Step</button>
+  </div>
+
+  <!-- Animated stepwise solution output (shared between both tabs) -->
+  <div class="solution-steps" id="solutionSteps"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Algorithm walkthrough: 6-step visual explainer -->
+<section id="how-it-works">
+  <div class="section-tag">05 Algorithm</div>
+  <h2 class="section-title">How Huffman Coding Works</h2>
+  <p class="section-sub">A step-by-step visual walkthrough of the algorithm, from counting characters to building the optimal prefix-free code.</p>
+
+  <!-- Steps are injected by JS from HOW_STEPS array in main.js -->
+  <div class="steps-flow" id="stepsFlow"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Session history: stored in localStorage, exportable as JSON -->
+<section id="history">
+  <div class="section-tag">06 History</div>
+  <h2 class="section-title">Session History</h2>
+  <p class="section-sub">Your recent encoding sessions, stored locally. Click any card to reload that session.</p>
+  <div class="history-controls">
+    <button class="hist-btn" onclick="exportHistory()">Export JSON</button>
+    <button class="hist-btn" onclick="importHistory()">Import JSON</button>
+    <button class="hist-btn" onclick="clearHistory()">Clear All</button>
+  </div>
+  <div class="history-list" id="historyList"></div>
+</section>
+
+<footer>
+  <p>Huffman Encoding Explorer</p>
+  <p style="margin-top:8px;font-size:12px">Huffman, D.A. (1952). A Method for the Construction of Minimum-Redundancy Codes.</p>
+</footer>
+
+<!-- Toast notification overlay -->
+<div id="toast"></div>
+
+<script src="main.js"></script>
+</body>
+</html>
